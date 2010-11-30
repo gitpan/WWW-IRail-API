@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::Stations::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::Stations::VERSION = '0.001';
+  $WWW::IRail::API::Stations::VERSION = '0.002';
 }
 use strict;
 use Carp qw/croak/;
@@ -43,7 +43,7 @@ sub parse_response {
         /xml/i and return XMLout $obj, RootName=>'stations', GroupTags => { stations => 'station' };
         /json/i and return JSON::XS->new->ascii->pretty->allow_nonref->encode($obj);
         /yaml/i and return freeze $obj;
-        /perl/i and return $obj;
+        /perl/i and return $obj->{station};
     }
 
     return $obj; # default to perl
@@ -58,7 +58,7 @@ sub parse_response {
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 NAME
 
@@ -84,7 +84,9 @@ Has no arguments, requests the whole list of stations from the API
 =head2 parse_response( I<{$http_response}>, I<"dataType">, I<filter()> )
 
 parses the HTTP::Response you got back from the server, which if all went well contains XML.
-That XML is then transformed into other data formats
+That XML is then transformed into other data formats.
+
+Note that the perl data format returns the data unnested for easier access.
 
 =over 4
 
@@ -112,10 +114,6 @@ perl (default)
 
 =head3 example of output when dataType = 'xml'
 
-=head1 METHODS
-
-=begin xml
-
     <stations>
       <station>\'S GRAVENBRAKEL</station>
       <station>AALST</station>
@@ -125,11 +123,7 @@ perl (default)
 
     </stations>
 
-=end xml
-
 =head3 example of output when dataType = 'XML'
-
-=begin xml
 
     <stations timestamp="1291047694" version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="stations.xsd">
       <station id="BE.NMBS.82" location="50.605075 4.137658" locationX="4.137658" locationY="50.605075">\'S GRAVENBRAKEL</station>
@@ -140,11 +134,9 @@ perl (default)
 
     </stations>
 
-=end xml
-
 =head3 example of output when dataType = 'JSON'
 
-=for json     { 
+    { 
       "station" : [
         "\'S GRAVENBRAKEL",
         "AALST",
@@ -156,7 +148,7 @@ perl (default)
 
 =head3 example of output when dataType = 'YAML'
 
-=for YAML     station:
+    station:
       - "\'S GRAVENBRAKEL"
       - AALST
       - AALST KERREBROEK
@@ -165,17 +157,17 @@ perl (default)
 
 =head3 example of output when dataType="perl" (default)
 
-=for perl     $VAR1 = {
-          'station' => [
-                       '\'S GRAVENBRAKEL',
-                       'AALST',
-                       'AALST KERREBROEK',
-                       'AALTER',
-                       'AARLEN',
-                       'AARSCHOT',
-                        # ...
+    $VAR1 = [
+               '\'S GRAVENBRAKEL',
+               'AALST',
+               'AALST KERREBROEK',
+               'AALTER',
+               'AARLEN',
+               'AARSCHOT',
+               # ...
             ]
-    };
+
+=head1 METHODS
 
 =head1 INSTALLATION
 

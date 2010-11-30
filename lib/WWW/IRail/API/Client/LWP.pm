@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::Client::LWP::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::Client::LWP::VERSION = '0.001';
+  $WWW::IRail::API::Client::LWP::VERSION = '0.002';
 }
 use parent 'Exporter';
 use strict;
@@ -40,7 +40,7 @@ __END__
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 INSTALLATION
 

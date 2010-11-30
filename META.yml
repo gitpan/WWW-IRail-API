@@ -30,5 +30,5 @@ requires:
 resources:
   homepage: http://github.com/blaze-x/www-irail-api/tree
   repository: git://github.com/blaze-x/www-irail-api.git
-version: 0.001
+version: 0.002
 x_authority: cpan:ESSELENS

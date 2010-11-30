@@ -3,9 +3,10 @@ BEGIN {
   $WWW::IRail::API::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::VERSION = '0.001';
+  $WWW::IRail::API::VERSION = '0.002';
 }
 use strict;
+use warnings;
 use Carp qw/croak/;
 use WWW::IRail::API::Stations;
 use WWW::IRail::API::Connections;
@@ -46,15 +47,24 @@ sub new {
 
 sub lookup_stations {
     my $self = shift;
-    my %opts = ref $_[0] ? %{$_[0]} : @_;
 
-    my $callback = ref $_[1] eq 'CODE' ? $_[1] : $opts{callback};
+    # auto dereference first argument from hashref to hash
+    my %opts = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+
+    # if the 2nd argumnet is a sub, use it as the callback, but only if the first was a {} 
+    my $callback = ref $_[0] eq 'HASH' && ref $_[1] eq 'CODE' ? $_[1] : $opts{callback};
+
+    # either the station or search parameter can be used to filter
+    my $re = $opts{station} || $opts{filter} || '.';
+
+    # check the filter is a sub or match using default sub
+    my $search_cb = ref $opts{filter} eq 'CODE' ? $opts{filter} : sub { m/$re/i };
 
     my $http_req = WWW::IRail::API::Stations::make_request();
     my $http_res = $self->{_client}->process($http_req, $callback);
     my $response = WWW::IRail::API::Stations::parse_response( $http_res, 
                                                               $opts{dataType} || $self->{dataType},
-                                                              sub { return /$opts{station}/i } );
+                                                              $search_cb );
     return $response;
 }
 
@@ -126,7 +136,7 @@ sub irail {
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 NAME
 
@@ -166,6 +176,25 @@ WWW::IRail::API is a set of modules which allow you to query the
 L<http://dev.irail.be> API for Stations, Connections, Liveboard and Vehicle
 data.
 
+=head1 METHODS
+
+=head2 new(I<key => 'value'> | I<{key => 'value'}>)
+
+Constructor. Should normally be used without arguments, but if required you
+could override some internals.
+
+    my $irail = new WWW::IRail::API( _client => 'LWP', dataType => 'JSON' );
+
+=head2 lookup_stations(I<key => 'value'> | I<{key => 'value'}>)
+
+Method which takes a string or a hash(ref) and returns a list of stations in the set C<dataType>.
+
+    my @list = $irail->lookup_stations(filter => "brussel");
+    my @list = $irail->lookup_stations(filter => qr/brussel/i);
+    my @list = $irail->lookup_stations(filter => sub { /brussel/i } );
+
+    my $json_string = $irail->lookup_stations(filter => qr/./, dataType => 'JSON');
+
 =head1 FEATURES
 
 =head2 Multiple output formats
@@ -200,6 +229,8 @@ call the callback and go async from there.
 
 If date matches C</\w/> it will hand over parsing to L<DateTime::Format::Natural>. 
 for example: date => 'friday at 6pm';
+
+=head1 METHODS
 
 =head1 LIMITATIONS
 
@@ -248,31 +279,19 @@ Example you can run from the commandline to get you started quickly
 
 =item *
 
-L<LWP>
+L<WWW::IRail::API::Stations>
 
 =item *
 
-L<HTTP::Request>
+L<WWW::IRail::API::Connections>
 
 =item *
 
-L<HTTP::Response>
+L<WWW::IRail::API::Vehicle>
 
 =item *
 
-L<XML::Simple>
-
-=item *
-
-L<JSON::XS>
-
-=item *
-
-L<YAML>
-
-=item *
-
-L<DateTime::Format::Natural>
+L<WWW::IRail::API::Liveboard>
 
 =back
 

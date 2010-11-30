@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::Connections::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::Connections::VERSION = '0.001';
+  $WWW::IRail::API::Connections::VERSION = '0.002';
 }
 use strict;
 
@@ -82,7 +82,7 @@ sub parse_response {
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 NAME
 

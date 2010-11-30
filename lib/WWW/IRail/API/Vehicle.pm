@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::Vehicle::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::Vehicle::VERSION = '0.001';
+  $WWW::IRail::API::Vehicle::VERSION = '0.002';
 }
 use strict;
 use Carp qw/croak/;
@@ -62,7 +62,7 @@ sub parse_response {
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 NAME
 
