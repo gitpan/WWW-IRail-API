@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::Liveboard::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::Liveboard::VERSION = '0.002';
+  $WWW::IRail::API::Liveboard::VERSION = '0.003';
 }
 use strict;
 use Carp qw/croak/;
@@ -65,7 +65,7 @@ sub parse_response {
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 NAME
 

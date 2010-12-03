@@ -16,6 +16,7 @@ requires:
   Carp: 0
   Date::Format: 0
   DateTime::Format::Natural: 0
+  FindBin: 0
   HTTP::Request: 0
   HTTP::Request::Common: 0
   HTTP::Response: 0
@@ -27,8 +28,9 @@ requires:
   XML::Simple: 0
   YAML: 0
   common::sense: 0
+  parent: 0
 resources:
-  homepage: http://github.com/blaze-x/www-irail-api/tree
-  repository: git://github.com/blaze-x/www-irail-api.git
-version: 0.002
+  homepage: http://github.com/timesselens/www-irail-api/tree
+  repository: git://github.com/timesselens/www-irail-api.git
+version: 0.003
 x_authority: cpan:ESSELENS

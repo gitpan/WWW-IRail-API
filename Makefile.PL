@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     'Carp' => '0',
     'Date::Format' => '0',
     'DateTime::Format::Natural' => '0',
+    'FindBin' => '0',
     'HTTP::Request' => '0',
     'HTTP::Request::Common' => '0',
     'HTTP::Response' => '0',
@@ -33,9 +34,10 @@ my %WriteMakefileArgs = (
     'Test::Most' => '0',
     'XML::Simple' => '0',
     'YAML' => '0',
-    'common::sense' => '0'
+    'common::sense' => '0',
+    'parent' => '0'
   },
-  'VERSION' => '0.002',
+  'VERSION' => '0.003',
   'test' => {
     'TESTS' => 't/*.t'
   }

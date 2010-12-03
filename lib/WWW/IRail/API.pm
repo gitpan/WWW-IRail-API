@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::VERSION = '0.002';
+  $WWW::IRail::API::VERSION = '0.003';
 }
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ sub new {
     my $class = ref $proto || $proto;
     my %attr = ( API => "v1", 
                  dataType => 'perl',
-                 _client => 'LWP',
+                 client => 'LWP',
                  _cache => { stations => [], 
                              connections => {}, 
                              liveboards => {}, 
@@ -32,13 +32,13 @@ sub new {
                  ref $attr eq 'HASH' ? %{$attr} : @{$attr || []} );
 
 
-    eval "require WWW::IRail::API::Client::$attr{_client}"; die $@ if $@;
+    eval "require WWW::IRail::API::Client::$attr{client}"; die $@ if $@;
 
-    "WWW::IRail::API::Client::$attr{_client}"->can('process') 
-        or croak "unable to initialize ". __PACKAGE__ ."::Client::$attr{_client} backend. ".
+    "WWW::IRail::API::Client::$attr{client}"->can('process') 
+        or croak "unable to initialize ". __PACKAGE__ ."::Client::$attr{client} backend. ".
                  "Is the module loaded?";
 
-    $attr{_client} = "WWW::IRail::API::Client::$attr{_client}"->new();
+    $attr{client} = "WWW::IRail::API::Client::$attr{client}"->new();
 
 
     return bless {%attr}, $class;
@@ -60,8 +60,8 @@ sub lookup_stations {
     # check the filter is a sub or match using default sub
     my $search_cb = ref $opts{filter} eq 'CODE' ? $opts{filter} : sub { m/$re/i };
 
-    my $http_req = WWW::IRail::API::Stations::make_request();
-    my $http_res = $self->{_client}->process($http_req, $callback);
+    my $http_req = WWW::IRail::API::Stations::make_request(\%opts);
+    my $http_res = $self->{client}->process($http_req, $callback);
     my $response = WWW::IRail::API::Stations::parse_response( $http_res, 
                                                               $opts{dataType} || $self->{dataType},
                                                               $search_cb );
@@ -75,7 +75,7 @@ sub lookup_connections {
     my $callback = ref $_[1] eq 'CODE' ? $_[1] : $opts{callback};
 
     my $http_req = WWW::IRail::API::Connections::make_request(\%opts);
-    my $http_res = $self->{_client}->process($http_req, $callback);
+    my $http_res = $self->{client}->process($http_req, $callback);
     my $response = WWW::IRail::API::Connections::parse_response( $http_res,
                                                                  $opts{dataType} || $self->{dataType});
     return $response;
@@ -88,7 +88,7 @@ sub lookup_liveboard {
     my $callback = ref $_[1] eq 'CODE' ? $_[1] : $opts{callback};
 
     my $http_req = WWW::IRail::API::Liveboard::make_request(\%opts);
-    my $http_res = $self->{_client}->process($http_req, $callback);
+    my $http_res = $self->{client}->process($http_req, $callback);
     my $response = WWW::IRail::API::Liveboard::parse_response( $http_res, 
                                                                $opts{dataType} || $self->{dataType});
     return $response;
@@ -101,7 +101,7 @@ sub lookup_vehicle {
     my $callback = ref $_[1] eq 'CODE' ? $_[1] : $opts{callback};
 
     my $http_req = WWW::IRail::API::Vehicle::make_request(\%opts);
-    my $http_res = $self->{_client}->process($http_req, $callback);
+    my $http_res = $self->{client}->process($http_req, $callback);
     my $response = WWW::IRail::API::Vehicle::parse_response( $http_res, 
                                                              $opts{dataType} || $self->{dataType});
     return $response;
@@ -136,7 +136,7 @@ sub irail {
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 NAME
 
@@ -183,7 +183,7 @@ data.
 Constructor. Should normally be used without arguments, but if required you
 could override some internals.
 
-    my $irail = new WWW::IRail::API( _client => 'LWP', dataType => 'JSON' );
+    my $irail = new WWW::IRail::API( client => 'LWP', dataType => 'JSON' );
 
 =head2 lookup_stations(I<key => 'value'> | I<{key => 'value'}>)
 

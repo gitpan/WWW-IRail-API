@@ -3,7 +3,7 @@ BEGIN {
   $WWW::IRail::API::Stations::AUTHORITY = 'cpan:ESSELENS';
 }
 BEGIN {
-  $WWW::IRail::API::Stations::VERSION = '0.002';
+  $WWW::IRail::API::Stations::VERSION = '0.003';
 }
 use strict;
 use Carp qw/croak/;
@@ -18,7 +18,14 @@ use YAML qw/freeze/;
 sub make_request {
     my %attr = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
 
-    my $url = 'http://dev.api.irail.be/stations/';
+    $attr{lang} ||= 'en';
+
+    croak "lang must match qr/(en | nl | fr | de)/x" unless $attr{lang} =~ m/en | nl | fr | de/x;
+
+    my $url = 'http://dev.api.irail.be/stations/?'.
+               join '&', map { $_.'='.$attr{$_} }
+               qw/lang/;
+
 
     my $req = new HTTP::Request(GET => $url);
 
@@ -28,7 +35,7 @@ sub make_request {
 sub parse_response {
     my ($http_response, $dataType, $filter) = @_;
 
-    my $obj = XMLin($http_response->content,
+    my $obj = XMLin($http_response->decoded_content,
         NoAttr => $dataType eq 'XML' ? 0 : 1,
         SuppressEmpty => '',
         NormaliseSpace => 2,
@@ -58,7 +65,7 @@ sub parse_response {
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 NAME
 
@@ -66,7 +73,15 @@ WWW::IRail::API::Stations - HTTP::Request builder and HTTP::Response parser for 
 
 =head1 SYNOPSIS
 
-    make_request();
+    use WWW::IRail::API::Stations;
+    use LWP::UserAgent();
+
+    my $ua = new LWP::UserAgent();
+       $ua->timeout(20);
+             
+    my $station_req = WWW::IRail::API::Stations::make_request();
+    my $http_resp = $ua->request($station_req);
+    my $result = WWW::IRail::API::Stations::parse_response($http_resp,'perl');
 
 =head1 DESCRIPTION
 
@@ -169,6 +184,16 @@ perl (default)
 
 =head1 METHODS
 
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<WWW::IRail::API>
+
+=back
+
 =head1 INSTALLATION
 
 See perlmodinstall for information and options on installing Perl modules.
@@ -195,4 +220,5 @@ the same terms as the Perl 5 programming language system itself.
 
 
 __END__
+
 
